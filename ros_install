@@ -1,0 +1,121 @@
+#!/bin/bash
+# software properties-common provides usefull scripts to handle PPA'S
+
+#If executing without root execute commands bellow
+
+
+common_source_and_key_setup()
+{
+    if [[ `id -u` != 0 ]] 
+        then
+            sudo apt update && sudo apt upgrade -y
+            sudo apt install software-properties-common
+            sudo add-apt-repository universe
+            #refresh repository list and update packages
+            #A GPG key here is used to ensure that we download from ROS2 repository and avoid downloading malicious code from someone pretendind to be ROS2 repository
+            #Install curl to download the key and adds ROS2 key to the list of trusted keys
+            sudo apt install -y curl
+            sudo curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg
+            echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(. /etc/os-release && echo $UBUNTU_CODENAME) main" | sudo tee /etc/apt/sources.list.d/ros2.list > /dev/null
+    #If I am already root execute without sudo
+    else
+            apt update && apt upgrade -y
+            apt install -y software-properties-common
+            add-apt-repository universe
+            apt install -y curl
+            curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg
+            echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(. /etc/os-release && echo $UBUNTU_CODENAME) main" | tee /etc/apt/sources.list.d/ros2.list > /dev/null
+    fi 
+}
+
+
+common_packages_install()
+{
+    if [[ `id -u` != 0 ]] 
+        then
+        sudo apt install python3-colcon-common-extensions
+        sudo apt install python3-rosdep
+        sudo rosdep init
+        rosdep update       
+    #If I am already root execute without sudo
+    else
+        apt install python3-colcon-common-extensions
+        apt install python3-rosdep
+        rosdep init && rosdep update
+    fi
+}
+
+
+install_ros_foxy()
+{
+    if [[ `id -u` != 0 ]] 
+    then
+        #refresh repository list and update packages
+        sudo apt update && sudo apt upgrade
+        #Install complete version of ROS2
+        sudo apt install python3-argcomplete
+        sudo apt install -y ros-foxy-desktop 
+   else
+        apt update && apt upgrade
+        apt install python3-argcomplete
+        apt install -y ros-foxy-desktop   
+    fi
+}
+
+install_ros_galactic()
+{
+    if [[ `id -u` != 0 ]] 
+    then
+        #refresh repository list and update packages
+        sudo apt update && sudo apt upgrade
+        #Install complete version of ROS2
+        sudo apt install -y ros-galactic-desktop 
+   else
+        apt update && apt upgrade
+        apt install -y ros-galactic-desktop   
+    fi
+}
+
+install_ros_humble()
+{
+    if [[ `id -u` != 0 ]] 
+    then
+        #refresh repository list and update packages
+        sudo apt update && sudo apt upgrade
+        #Install complete version of ROS2
+        sudo apt install -y ros-humble-desktop 
+   else
+        apt update && apt upgrade
+        apt install -y ros-humble-desktop   
+    fi
+}
+
+
+
+echo "Return the number corresponding to the ros version you what to install"
+echo "1 - Install ROS Foxy"
+echo "2 - Install ROS Galactic"
+echo "2 - Install ROS Humble"
+
+read option
+
+case $option in
+  1)
+    common_source_and_key_setup
+    install_ros_foxy
+    common_packages_install
+    ;;
+  2)
+    common_source_and_key_setup
+    install_ros_galactic
+    common_packages_install
+    ;;
+  3)
+    common_source_and_key_setup
+    install_ros_humble
+    common_packages_install
+    ;;
+  *)
+    echo "Invalid selection"
+    ;;
+esac
