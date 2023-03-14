@@ -95,7 +95,7 @@ install_ros_humble()
 echo "Return the number corresponding to the ros version you what to install"
 echo "1 - Install ROS Foxy"
 echo "2 - Install ROS Galactic"
-echo "2 - Install ROS Humble"
+echo "3 - Install ROS Humble"
 
 read option
 
